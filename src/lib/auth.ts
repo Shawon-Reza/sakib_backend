@@ -25,6 +25,71 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         sendVerificationEmail: true,
+        // =================== Password Reset Email Configuration ====================\\
+        sendResetPassword: async ({ user, url, token }, request) => {
+            try {
+                console.log("URL:",url,"Token:", token)
+                const info = await transporter.sendMail({
+                    from: '"Reset" <team@example.com>', // sender address
+                    to: `${user.email}`, // list of recipients
+                    subject: "Reset Your Password", // subject line
+                    text: `Click the link to reset your password: ${url}`, // plain text body
+                    html: `
+  <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 40px;">
+    <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center;">
+      
+      <h2 style="color: #333;">Reset Your Password</h2>
+
+      <p style="color: #555; font-size: 14px;">
+        Hi ${user.name || "there"}, 👋 <br/><br/>
+        We received a request to reset your password. Click the button below to set a new one.
+      </p>
+
+      <a href="${url}" 
+         style="
+           display: inline-block;
+           margin-top: 20px;
+           padding: 12px 24px;
+           background-color: #ef4444;
+           color: #ffffff;
+           text-decoration: none;
+           border-radius: 6px;
+           font-weight: bold;
+         ">
+         Reset Password
+      </a>
+
+      <p style="margin-top: 20px; font-size: 12px; color: #888;">
+        This link will expire soon for security reasons.
+      </p>
+
+      <p style="margin-top: 10px; font-size: 12px; color: #888;">
+        If you didn’t request a password reset, you can safely ignore this email.
+      </p>
+
+      <hr style="margin: 30px 0;" />
+
+      <p style="font-size: 12px; color: #aaa;">
+        Or copy and paste this link:<br/>
+        <a href="${url}" style="color: #ef4444;">${url}</a>
+      </p>
+
+    </div>
+  </div>
+`// HTML body
+                });
+                console.log("Message sent: %s", info.messageId);
+                console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+            } catch (error) {
+                console.error("Error while sending mail:", error);
+            }
+
+        },
+        onPasswordReset: async ({ user }, request) => {
+            // your logic here
+            console.log(`Password for user ${user.email} has been reset.`);
+        },
 
     },
     // ===================== Adding Custom Fields to User Model ====================\\
@@ -54,7 +119,7 @@ export const auth = betterAuth({
         autoSignInAfterVerification: true,
         sendVerificationEmail: async ({ user, url, token }, request) => {
             try {
-                console.log(user)
+                // console.log(user)
                 const info = await transporter.sendMail({
                     from: '"Sakib" <prisma@prismapractice.com>',
                     to: `${user.email}`, // list of recipients
@@ -102,13 +167,13 @@ export const auth = betterAuth({
                 });
 
                 console.log("Message sent: %s", info.messageId);
-                // Preview URL is only available when using an Ethereal test account
                 console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
             } catch (err) {
                 console.error("Error while sending mail:", err);
             }
         },
     },
+    // =================== Password Reset Email Configuration ====================\\
 
 
 });
