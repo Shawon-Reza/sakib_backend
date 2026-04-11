@@ -6,35 +6,40 @@ import nodemailer from "nodemailer";
 // ==================== Setting up Nodemailer Transporter for Email Sending ====================\\
 const transporter = nodemailer.createTransport({
 
-    host: "smtp.gmail.com.",
-    port: 587,
-    secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
+  host: "smtp.gmail.com.",
+  port: 587,
+  secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
 });
 
 
 
 export const auth = betterAuth({
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ],
 
-    database: prismaAdapter(prisma, {
-        provider: "postgresql",           // or "mysql", "postgresql", ...etc
-    }),
-    emailAndPassword: {
-        enabled: true,
-        sendVerificationEmail: true,
-        // =================== Password Reset Email Configuration ====================\\
-        sendResetPassword: async ({ user, url, token }, request) => {
-            try {
-                console.log("URL:",url,"Token:", token)
-                const info = await transporter.sendMail({
-                    from: '"Reset" <team@example.com>', // sender address
-                    to: `${user.email}`, // list of recipients
-                    subject: "Reset Your Password", // subject line
-                    text: `Click the link to reset your password: ${url}`, // plain text body
-                    html: `
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",           // or "mysql", "postgresql", ...etc
+  }),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true, 
+    sendVerificationEmail: true,
+    // =================== Password Reset Email Configuration ====================\\
+    sendResetPassword: async ({ user, url, token }, request) => {
+      try {
+        console.log("URL:", url, "Token:", token)
+        const info = await transporter.sendMail({
+          from: '"Reset" <team@example.com>', // sender address
+          to: `${user.email}`, // list of recipients
+          subject: "Reset Your Password", // subject line
+          text: `Click the link to reset your password: ${url}`, // plain text body
+          html: `
   <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 40px;">
     <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center;">
       
@@ -77,55 +82,56 @@ export const auth = betterAuth({
     </div>
   </div>
 `// HTML body
-                });
-                console.log("Message sent: %s", info.messageId);
-                console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+        });
+        console.log("Message sent: %s", info.messageId);
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 
-            } catch (error) {
-                console.error("Error while sending mail:", error);
-            }
-
-        },
-        onPasswordReset: async ({ user }, request) => {
-            // your logic here
-            console.log(`Password for user ${user.email} has been reset.`);
-        },
+      } catch (error) {
+        console.error("Error while sending mail:", error);
+      }
 
     },
-    // ===================== Adding Custom Fields to User Model ====================\\
-    user: {
-        additionalFields: {
-            role: {
-                type: "string",
-                input: true,
-                defaultValue: "USER",
-                required: true,
-                unique: false,
-            }
-
-        },
-        phone: {
-            type: "string",
-            required: false,
-            input: true,
-
-        },
+    onPasswordReset: async ({ user }, request) => {
+      // your logic here
+      console.log(`Password for user ${user.email} has been reset.`);
     },
 
-    // ==================== Email verification send configuration ====================\\
-    emailVerification: {
-        sendOnSignUp: true,
-        enabled: true,
-        autoSignInAfterVerification: true,
-        sendVerificationEmail: async ({ user, url, token }, request) => {
-            try {
-                // console.log(user)
-                const info = await transporter.sendMail({
-                    from: '"Sakib" <prisma@prismapractice.com>',
-                    to: `${user.email}`, // list of recipients
-                    subject: "Verify Your Email", // subject line
-                    text: `Hi ${user.name || "there"},\n\nPlease verify your email address by clicking the link below:\n\n${url}\n\nIf you didn’t create an account, you can safely ignore this email.`, // plain text body
-                    html: `
+  },
+  // ===================== Adding Custom Fields to User Model ====================\\
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        input: true,
+        defaultValue: "USER",
+        required: true,
+        unique: false,
+      }
+
+      ,
+      phone: {
+        type: "string",
+        required: false,
+        input: true,
+
+      },
+    }
+  },
+
+  // ==================== Email verification send configuration ====================\\
+  emailVerification: {
+    sendOnSignUp: true,
+    enabled: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url, token }, request) => {
+      try {
+        // console.log(user)
+        const info = await transporter.sendMail({
+          from: '"Sakib" <prisma@prismapractice.com>',
+          to: `${user.email}`, // list of recipients
+          subject: "Verify Your Email", // subject line
+          text: `Hi ${user.name || "there"},\n\nPlease verify your email address by clicking the link below:\n\n${url}\n\nIf you didn’t create an account, you can safely ignore this email.`, // plain text body
+          html: `
   <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 40px;">
     <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center;">
       
@@ -164,16 +170,16 @@ export const auth = betterAuth({
     </div>
   </div>
 ` // HTML body
-                });
+        });
 
-                console.log("Message sent: %s", info.messageId);
-                console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-            } catch (err) {
-                console.error("Error while sending mail:", err);
-            }
-        },
+        console.log("Message sent: %s", info.messageId);
+        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+      } catch (err) {
+        console.error("Error while sending mail:", err);
+      }
     },
-    // =================== Password Reset Email Configuration ====================\\
+  },
+  // =================== Password Reset Email Configuration ====================\\
 
 
 });
