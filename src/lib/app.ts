@@ -5,6 +5,7 @@ import { auth } from "./auth";
 import cors from "cors";
 import customerRoute from "../modules/customers/customer.router";
 import { globalErrorHandler } from "../middleware/globalErrorHandler";
+import invoiceRouter from "../modules/invoices/invoice.router";
 
 const app: Application = express();
 app.use(cors({
@@ -48,6 +49,7 @@ app.use(express.json()); // Middleware to parse JSON bodies
 
 // ====================== Routes Redirects ====================== \\ 
 app.use("/api/customers", customerRoute);
+app.use("/api/invoices", invoiceRouter);
 
 
 
