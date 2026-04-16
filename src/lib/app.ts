@@ -3,6 +3,8 @@ import express from "express";
 import type { Application, Request, Response } from "express";
 import { auth } from "./auth";
 import cors from "cors";
+import customerRoute from "../modules/customers/customer.router";
+import { globalErrorHandler } from "../middleware/globalErrorHandler";
 
 const app: Application = express();
 app.use(cors({
@@ -44,6 +46,10 @@ app.all('/api/auth/*splat', toNodeHandler(auth));
 app.use(express.json()); // Middleware to parse JSON bodies
 
 
+// ====================== Routes Redirects ====================== \\ 
+app.use("/api/customers", customerRoute);
+
+
 
 
 
@@ -52,7 +58,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-
+// ❗ MUST be last middleware
+app.use(globalErrorHandler);
 
 
 
