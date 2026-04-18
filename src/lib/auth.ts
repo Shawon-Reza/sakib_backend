@@ -3,17 +3,49 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import nodemailer from "nodemailer";
 
+const smtpUser = process.env.SMTP_USER?.trim();
+const smtpPass = process.env.SMTP_PASS?.replace(/\s+/g, "");
+
+if (!smtpUser || !smtpPass) {
+  throw new Error(
+    "Missing SMTP credentials. Set SMTP_USER and SMTP_PASS in your environment."
+  );
+}
+
+if (!smtpUser.includes("@")) {
+  console.warn(
+    "SMTP_USER does not look like an email address. For Gmail, use your full Gmail address."
+  );
+}
+
 // ==================== Setting up Nodemailer Transporter for Email Sending ====================\\
 const transporter = nodemailer.createTransport({
-
-  host: "smtp.gmail.com.",
+  host: "smtp.gmail.com",
   port: 587,
   secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: smtpUser,
+    pass: smtpPass,
   },
 });
+
+const logMailError = (error: unknown) => {
+  if (
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    "responseCode" in error &&
+    (error as { code?: string }).code === "EAUTH" &&
+    (error as { responseCode?: number }).responseCode === 535
+  ) {
+    console.error(
+      "Error while sending mail: Gmail rejected login. Use your Gmail address as SMTP_USER and a 16-character Google App Password as SMTP_PASS (not your regular Gmail password)."
+    );
+    return;
+  }
+
+  console.error("Error while sending mail:", error);
+};
 
 
 
@@ -87,7 +119,7 @@ export const auth = betterAuth({
         console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 
       } catch (error) {
-        console.error("Error while sending mail:", error);
+        logMailError(error);
       }
 
     },
@@ -175,7 +207,7 @@ export const auth = betterAuth({
         console.log("Message sent: %s", info.messageId);
         console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
       } catch (err) {
-        console.error("Error while sending mail:", err);
+        logMailError(err);
       }
     },
   },

@@ -1,0 +1,11 @@
+export const ENV_EXAMPLE = `PORT=5000
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DB_NAME?schema=public"
+
+# Better Auth
+BETTER_AUTH_SECRET="replace-with-a-strong-secret"
+BETTER_AUTH_URL="http://localhost:5000"
+
+# Gmail SMTP (use Google App Password, not your regular Gmail password)
+SMTP_USER="your-gmail-address@gmail.com"
+SMTP_PASS="your-16-char-google-app-password"
+`;
