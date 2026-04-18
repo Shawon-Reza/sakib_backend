@@ -6,6 +6,8 @@ import cors from "cors";
 import customerRoute from "../modules/customers/customer.router";
 import { globalErrorHandler } from "../middleware/globalErrorHandler";
 import invoiceRouter from "../modules/invoices/invoice.router";
+import { requireAuth } from "../middleware/middleware";
+import { Role } from "../../prisma/generated/prisma/enums";
 
 const app: Application = express();
 app.use(cors({
@@ -49,7 +51,7 @@ app.use(express.json()); // Middleware to parse JSON bodies
 
 // ====================== Routes Redirects ====================== \\ 
 app.use("/api/customers", customerRoute);
-app.use("/api/invoices", invoiceRouter);
+app.use("/api/invoices", requireAuth(Role.ADMIN), invoiceRouter);
 
 
 
@@ -58,7 +60,6 @@ app.use("/api/invoices", invoiceRouter);
 app.get("/", (req: Request, res: Response) => {
     res.send("Server  for Sakib is running....");
 });
-
 
 
 // ❗ MUST be last middleware
