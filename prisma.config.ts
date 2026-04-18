@@ -1,14 +1,15 @@
 // prisma.config.ts
-import "dotenv/config";   // This line is critical — keep it at the very top
+import "dotenv/config";
 
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
 
 export default defineConfig({
-  schema: "prisma/schema",           // your current setting (no .prisma extension needed if it's a folder)
+  schema: "prisma/schema",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("DIRECT_URL"),          // for prisma migrate deploy
+    // Fallback to prevent crash if variable is missing during loading
+    url: process.env.DIRECT_URL || process.env.DATABASE_URL,
   },
 });
