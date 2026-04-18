@@ -1,5 +1,20 @@
 node_modules
 # Keep environment variables out of version control
 .env
+dist/
+
+# Prevent accidental TypeScript emit into source/root
+src/**/*.js
+src/**/*.js.map
+src/**/*.d.ts
+src/**/*.d.ts.map
+env.example.js
+env.example.js.map
+env.example.d.ts
+env.example.d.ts.map
+prisma.config.js
+prisma.config.js.map
+prisma.config.d.ts
+prisma.config.d.ts.map
 
 /generated/prisma

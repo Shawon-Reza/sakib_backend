@@ -1,6 +1,6 @@
 
 import type { NextFunction, Request, Response } from "express";
-import { customerService } from "./customer.service";
+import { customerService } from "./customer.service.js";
 
 
 const createCustomer = async (req: Request, res: Response, next: NextFunction) => {

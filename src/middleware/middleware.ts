@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../lib/auth";
-import { Role } from "../../prisma/generated/prisma/client";
+import { auth } from "../lib/auth.js";
+
+type Role = "ADMIN" | "USER";
 
 type AppUser = {
     id: string;
@@ -27,8 +28,6 @@ export const requireAuth = (...allowedRoles: Role[]) => {
                 headers: fromNodeHeaders(req.headers),
             });
 
-            console.log(session)
-            console.log(allowedRoles)
 
 
             if (!session) {

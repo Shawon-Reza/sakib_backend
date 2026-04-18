@@ -1,8 +1,7 @@
-import type { Prisma } from "../../../prisma/generated/prisma/client";
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 
 
-const createCustomer = async (customerData: Prisma.CustomerCreateInput) => {
+const createCustomer = async (customerData: any) => {
     // Implementation for creating a customer
     try {
         console.log("Customer data From Service:", customerData);

@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { invoiceService } from "./invoice.service";
+import { invoiceService } from "./invoice.service.js";
 
 
 
@@ -21,6 +21,7 @@ const createInvoice = async (req: Request, res: Response, next: NextFunction) =>
 }
 //  ====================== Get All Invoices ====================== \\
 const getInvoices = async (req: Request, res: Response, next: NextFunction) => {
+    
     try {
         const queries = req.query;
         const result = await invoiceService.getInvoices(queries as any);

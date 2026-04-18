@@ -1,13 +1,12 @@
 import { fromNodeHeaders, toNodeHandler } from "better-auth/node";
 import express from "express";
 import type { Application, Request, Response } from "express";
-import { auth } from "./auth";
+import { auth } from "./auth.js";
 import cors from "cors";
-import customerRoute from "../modules/customers/customer.router";
-import { globalErrorHandler } from "../middleware/globalErrorHandler";
-import invoiceRouter from "../modules/invoices/invoice.router";
-import { requireAuth } from "../middleware/middleware";
-import { Role } from "../../prisma/generated/prisma/enums";
+import customerRoute from "../modules/customers/customer.router.js";
+import { globalErrorHandler } from "../middleware/globalErrorHandler.js";
+import invoiceRouter from "../modules/invoices/invoice.router.js";
+import { requireAuth } from "../middleware/middleware.js";
 
 const app: Application = express();
 app.use(cors({
@@ -51,7 +50,7 @@ app.use(express.json()); // Middleware to parse JSON bodies
 
 // ====================== Routes Redirects ====================== \\ 
 app.use("/api/customers", customerRoute);
-app.use("/api/invoices", requireAuth(Role.ADMIN), invoiceRouter);
+app.use("/api/invoices", requireAuth("ADMIN"), invoiceRouter);
 
 
 

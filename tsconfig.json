@@ -1,48 +1,41 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
+    "rootDir": ".",
+    "outDir": "./dist",
 
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
+    // Module / Environment
     "module": "ESNext",
     "target": "ES2023",
-    "types": [""],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
 
-    // Other Outputs
+    // Node.js specific
+    "lib": ["ES2023"],
+    "types": ["node"],
+
+    // Output
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    "declaration": false,           // Usually not needed for backend
+    "declarationMap": false,
 
-    // Stricter Typechecking Options
+    // Strictness (highly recommended)
+    "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-     "moduleResolution": "bundler",
 
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
-    "strict": true,
-    "jsx": "react-jsx",
+    // Modern TypeScript features
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "esModuleInterop": true,
-    "ignoreDeprecations": "6.0"
+    "forceConsistentCasingInFileNames": true,
 
-  }
+    // Remove these if you're not using React in backend
+    "jsx": "react-jsx"   // ← Comment out or remove for pure backend
+  },
+
+  // Important: Add these at the root level
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

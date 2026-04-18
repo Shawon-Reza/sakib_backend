@@ -1,6 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
-import { Prisma } from "../../prisma/generated/prisma/client";
-// import { Prisma } from "../../generated/prisma/client";
+
+const isPrismaKnownError = (err: any): err is { code: string; message: string; meta?: unknown } =>
+    Boolean(err && typeof err === "object" && typeof err.code === "string" && /^P\d{4}$/.test(err.code));
+
+const isPrismaValidationError = (err: any): err is { message: string } =>
+    Boolean(err && typeof err === "object" && typeof err.message === "string" && /prisma/i.test(err.message));
 
 export const globalErrorHandler = (
     err: any,
@@ -30,7 +34,7 @@ export const globalErrorHandler = (
     // =====================================================
     // 🟡 1. PRISMA KNOWN REQUEST ERRORS (P2000 - P2029)
     // =====================================================
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (isPrismaKnownError(err)) {
 
         const code = err.code;
 
@@ -134,7 +138,7 @@ export const globalErrorHandler = (
     // =====================================================
     // 🟠 2. PRISMA VALIDATION ERROR
     // =====================================================
-    if (err instanceof Prisma.PrismaClientValidationError) {
+    if (isPrismaValidationError(err)) {
 
         const message = err.message;
 
@@ -175,10 +179,10 @@ export const globalErrorHandler = (
     // 🔴 3. PRISMA INIT ERROR (DB CONNECTION / ENV)
     // Covers P1000 - P1017 + P3000 - P3024 (schema engine)
     // =====================================================
-    if (err instanceof Prisma.PrismaClientInitializationError) {
+    if (isPrismaKnownError(err) && ["P1000", "P1001", "P1002", "P1003", "P1008", "P1010", "P1011", "P1012", "P1013", "P1014", "P1015", "P1016", "P1017"].includes(err.code)) {
         return res.status(500).json({
             success: false,
-            type: err.errorCode || "PRISMA_INIT_ERROR",
+            type: err.code || "PRISMA_INIT_ERROR",
             message: err.message,
         });
     }
@@ -187,7 +191,7 @@ export const globalErrorHandler = (
     // ⚪ 4. PRISMA UNKNOWN ENGINE ERROR
     // Covers P6000 - P6010 (Accelerate, engine crash, etc.)
     // =====================================================
-    if (err instanceof Prisma.PrismaClientUnknownRequestError) {
+    if (isPrismaKnownError(err) && ["P6000", "P6001", "P6002", "P6003", "P6004", "P6005", "P6006", "P6007", "P6008", "P6009", "P6010"].includes(err.code)) {
         return res.status(500).json({
             success: false,
             type: "PRISMA_UNKNOWN_ERROR",

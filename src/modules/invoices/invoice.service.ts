@@ -1,5 +1,5 @@
 
-import { prisma } from "../../lib/prisma";
+import { prisma } from "../../lib/prisma.js";
 
 const ALLOWED_STATUSES = ["PAID", "PARTIAL", "DUE"] as const;
 type InvoiceStatus = (typeof ALLOWED_STATUSES)[number];
@@ -74,7 +74,7 @@ const createInvoice = async (payload: any) => {
         const receivedAmount = Number(payload.receivedAmount ?? 0);
         const dueAmount = Number(payload.dueAmount ?? Math.max(totalAmount - receivedAmount, 0));
 
-        const createdInvoice = await prisma.$transaction(async (tx) => {
+        const createdInvoice = await prisma.$transaction(async (tx: any) => {
             // ================== Check if customer exists based on phone number, if not create a new customer ==================\\
             let customer = await tx.customer.findUnique({
                 where: {
