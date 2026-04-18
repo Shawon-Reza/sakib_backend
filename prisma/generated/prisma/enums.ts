@@ -9,6 +9,15 @@
 * 🟢 You can import this file directly.
 */
 
+export const InvoiceStatus = {
+  PAID: 'PAID',
+  PARTIAL: 'PARTIAL',
+  DUE: 'DUE'
+} as const
+
+export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]
+
+
 export const Role = {
   ADMIN: 'ADMIN',
   USER: 'USER'

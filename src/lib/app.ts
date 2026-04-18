@@ -60,6 +60,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
+
 // ❗ MUST be last middleware
 app.use(globalErrorHandler);
 

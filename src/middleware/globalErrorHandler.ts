@@ -9,7 +9,23 @@ export const globalErrorHandler = (
     next: NextFunction
 ) => {
 
-    console.error("🔥 FULL PRISMA ERROR:", err);
+    console.error("🔥 FULL ERROR:", err);
+
+    // =====================================================
+    // 🔵 0. MALFORMED JSON BODY (body-parser)
+    // =====================================================
+    if (
+        err instanceof SyntaxError &&
+        typeof err === "object" &&
+        "type" in err &&
+        (err as { type?: string }).type === "entity.parse.failed"
+    ) {
+        return res.status(400).json({
+            success: false,
+            type: "INVALID_JSON",
+            message: "Malformed JSON in request body",
+        });
+    }
 
     // =====================================================
     // 🟡 1. PRISMA KNOWN REQUEST ERRORS (P2000 - P2029)
@@ -187,8 +203,4 @@ export const globalErrorHandler = (
         type: "INTERNAL_SERVER_ERROR",
         message: err?.message || "Something went wrong",
     });
-};// helper (VERY IMPORTANT)
-function extractFromBackticks(text: string) {
-    const match = text.match(/`([^`]+)`/);
-    return match?.[1];
-}
+};
