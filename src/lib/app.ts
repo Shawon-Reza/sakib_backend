@@ -9,9 +9,13 @@ import invoiceRouter from "../modules/invoices/invoice.router.js";
 import { requireAuth } from "../middleware/middleware.js";
 
 const app: Application = express();
+const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
 app.use(cors({
-    origin: 'http://localhost:3000',
-    // origin: "*",
+    origin: corsOrigins,
     credentials: true,
 }))
 

@@ -49,11 +49,14 @@ const logMailError = (error: unknown) => {
 
 
 
+
+const trustedOrigins = (process.env.TRUSTED_ORIGINS || "http://localhost:3000,http://127.0.0.1:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 export const auth = betterAuth({
-  trustedOrigins: [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-  ],
+  trustedOrigins,
 
   database: prismaAdapter(prisma, {
     provider: "postgresql",           // or "mysql", "postgresql", ...etc
